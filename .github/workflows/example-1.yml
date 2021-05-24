@@ -8,12 +8,12 @@ on:
       environment:
         description: The environment you want to deplpoy to
         required: True
-
+env:
+  APP_NAME: example-app
 jobs:
   deploy:
     name: Deploy a Version
     runs-on: ubuntu-latest
     steps:
       - name: Use the variable
-        run: echo ${{ github.event.inputs.sha }}
-        
+        run: echo deploying app ${{ env.APP_NAME }}${{ github.event.inputs.sha }}
