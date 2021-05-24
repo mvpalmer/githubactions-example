@@ -1,0 +1,19 @@
+name: Manual Inputs
+on:
+  workflow_dispatch:
+    inputs:
+      sha:
+        description: The SHA you want to deploy
+        required: True
+      environment:
+        description: The environment you want to deplpoy to
+        required: True
+
+jobs:
+  deploy:
+    name: Deploy a Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Use the variable
+        run: echo ${{ github.event.inputs.sha }}
+        
