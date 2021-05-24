@@ -5,7 +5,7 @@ env:
   IMAGE_BASE_NAME: this-is-it
 
 jobs:
-  build-and-push-to-repo
+  build-and-push-to-repo:
   runs-on: ubuntu-latest
   steps:
     - name: checkout
@@ -14,5 +14,3 @@ jobs:
     - name: build and tag
       run: |
         echo building adocker image
-
-        
