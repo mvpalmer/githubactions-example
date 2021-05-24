@@ -1,0 +1,18 @@
+name: On Push
+on: [push]
+
+env:
+  IMAGE_BASE_NAME: this-is-it
+
+jobs:
+  build-and-push-to-repo
+  runs-on: ubuntu-latest
+  steps:
+    - name: checkout
+      uses: actions/checkout@v2
+
+    - name: build and tag
+      run: |
+        echo building adocker image
+
+        
