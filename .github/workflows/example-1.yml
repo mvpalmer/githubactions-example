@@ -16,4 +16,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Use the variable
-        run: echo deploying app ${{ env.APP_NAME }}${{ github.event.inputs.sha }}
+        run: echo deploying app ${{ env.APP_NAME }} ${{ github.event.inputs.sha }}

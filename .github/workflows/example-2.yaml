@@ -1,0 +1,48 @@
+name: Deployment
+on:
+  workflow_dispatch:
+    inputs:
+      git-sha:
+        description: 'Git SHA'
+        required: True
+      env:
+        description: 'Deploy target environment'
+        required: True
+      target:
+        description: 'Are you deploying to AWS or GCP?'
+        required: True
+        default: 'AWS'
+
+# Variables available to all jobs/steps in the workflow
+env:
+  SERVICE: service
+  US_REGISTRY_HOSTNAME: us.gcr.io
+
+jobs:
+  deploy:
+    name: Deploy a Version
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
+      - name: Setup gcloud CLI
+        if: github.event.inputs.target = 'GCP'
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          version: 'latest'
+          service_account_key: ${{ secrets.GCP_SA_CREDS }}
+          export_default+credentials: True
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+
+      - name: Login to GCR
+        id: login-gcr
+        run: |
+          gcloud auth configure-docker
+
+      - name: Deploy to CloudRun
+        id: deploy-gcp
+        env:
+          IMAGE_NAME = ${{ env.US_REGISTRY_HOSTNAME }}/${{ secrets.GCR_IMAGE_PROJECT_ID }}/${{ env.SERVICE }}:${{ github.event.inputs.git-sha }}
+        run: |
+          echo Deploying ${{ env.IMAGE_NAME }}
