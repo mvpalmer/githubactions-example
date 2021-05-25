@@ -8,9 +8,15 @@ on:
       environment:
         description: The environment you want to deplpoy to
         required: True
+      target:
+        description: The environment you want to deplpoy to
+        required: True
+        default: AWS
+
 env:
   SERVICE: example-app
   US_REGISTRY_HOSTNAME: us.gcr.io
+
 
 jobs:
   deploy:
@@ -26,5 +32,5 @@ jobs:
         run: echo deploying ${{ env.IMAGE_NAME }}
 
       - name: if statement
-        if: ${{ github.event.inputs.environment == 'beta' }}
+        if: ${{ github.event.inputs.environment == 'beta' && github.event.inputs.environment == 'AWS' }}
         run: echo This is beta deployment
