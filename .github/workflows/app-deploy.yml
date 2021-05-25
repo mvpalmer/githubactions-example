@@ -22,7 +22,7 @@ jobs:
 
       - name: Use the variable
         env:
-          IMAGE_NAME = ${{ env.US_REGISTRY_HOSTNAME }}/my-project/${{ env.SERVICE }}:${{ github.event.inputs.git-sha }}
+          IMAGE_NAME: ${{ env.US_REGISTRY_HOSTNAME }}/my-project/${{ env.SERVICE }}:${{ github.event.inputs.git-sha }}
         run: echo deploying ${{ env.IMAGE_NAME }}
 
       - name: if statement
