@@ -1,0 +1,86 @@
+# This is a basic workflow that is manually triggered
+
+name: manually
+
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      git-sha:
+        description: git SHA
+        required: true
+      environment:
+        description: Deploy target environment
+        required: true
+      target:
+        description: Are you deploying to AWS or GCP?
+        required: true
+        default: AWS
+
+env:
+  SERVICE: app-service
+  US_REGISTRY_HOSTNAME: us.gcr.io
+  EU_REGISTRY_HOSTNAME: eu.gcr.io
+  ECR_BASE: 999999999999.dkr.ecr.us-east-2.amazonaws.com
+  ECR_PROD_EAST: 999999999999.dkr.ecr.us-east-2.amazonaws.com
+  ECR_PROD_WEST: 999999999999.dkr.ecr.us-west-2.amazonaws.com
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Configure AWS Credentials PROD/QA
+      if: ${{ github.event.inputs.environment == 'prod' || github.event.inputs.environment == 'qa' && github.event.inputs.target == 'AWS' }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-west-2
+
+    - name: Configure AWS Credentials DR
+      if: ${{ github.event.inputs.environment == 'dr' && github.event.inputs.target == 'AWS' }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    - name: Configure AWS Credentials beta
+      if: ${{ github.event.inputs.environment == 'beta' && github.event.inputs.target == 'AWS' }}
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: us-east-2
+
+    - name: Setup gcloud CLI
+      if: ${{ github.event.inputs.target == 'GCP' && github.event.inputs.env == 'beta' }}
+      uses: google-github-actions/setup-gcloud@master
+      with:
+        version: 'latest'
+        service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+        export_default_credentils: true
+        project_id: ${{ secrets.GCP_BETA_PROJECT }}
+
+    - name: Login to GCR
+      id: login-gcr
+      if: ${{ github.event.inputs.target == 'GCP' }}
+      run: |
+        # Setup docker to authenticate via gcloud command-line tool
+        gcloud auth configure-docker
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+
+        if: ${{ github.event.inputs.target == 'AWS' }}
+      uses: aws-actions/amazon-ecr-login@v1
+
+    - name: K8s Deploy
+      if: ${{ github.event.inputs.target == 'AWS' }}
+      run: |
+        echo "Starting the deployment of ${{ github.event.inputs.git-sha }} to ${{ github.event.inputs.environment }}"
+        # aws eks --region ${envParams.region} update-kubeconfig --name ${envParams.cluster}
+        # deploy/k8s/run_deployment.sh ${envParams.namespace} ${{ github.event.inputs.get-sha }} ${envParams.dockerRepo} ${envParams.replicas}
