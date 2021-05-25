@@ -4,18 +4,20 @@ on:
     inputs:
       git-sha:
         description: The git SHA you want to deploy
-        required: True
+        required: true
       environment:
         description: The environment you want to deplpoy to
-        required: True
+        required: true
       target:
         description: The environment you want to deplpoy to
-        required: True
+        required: true
         default: AWS
 
 env:
   SERVICE: example-app
   US_REGISTRY_HOSTNAME: us.gcr.io
+  NAMESPACE: vndly-${{ github.event.inputs.environment }}
+  CLUSTER_NAME: vndly-cluster-${{ github.event.inputs.environment }}
 
 
 jobs:
@@ -33,4 +35,4 @@ jobs:
 
       - name: if statement
         if: ${{ github.event.inputs.environment == 'beta' && github.event.inputs.target == 'AWS' }}
-        run: echo This is beta deployment
+        run: echo This is beta deployment to namespace ${{ env.NAMESPACE }} in cluster ${{ env.CLUSTER_NAME }}
