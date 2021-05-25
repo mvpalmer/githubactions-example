@@ -3,14 +3,15 @@ on:
   workflow_dispatch:
     inputs:
       git-sha:
-        description: The SHA you want to deploy
+        description: The git SHA you want to deploy
         required: True
-      env:
+      environment:
         description: The environment you want to deplpoy to
         required: True
 env:
   SERVICE: example-app
   US_REGISTRY_HOSTNAME: us.gcr.io
+
 jobs:
   deploy:
     name: Deploy a Version
@@ -23,3 +24,7 @@ jobs:
         env:
           IMAGE_NAME = ${{ env.US_REGISTRY_HOSTNAME }}/my-project/${{ env.SERVICE }}:${{ github.event.inputs.git-sha }}
         run: echo deploying ${{ env.IMAGE_NAME }}
+
+      - name: if statement
+        if: ${{ github.event.inputs.environment == 'beta' }}
+        run: echo This is beta deployment
