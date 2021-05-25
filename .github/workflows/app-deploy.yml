@@ -1,19 +1,25 @@
-name: Manual Inputs
+name: Deployment
 on:
   workflow_dispatch:
     inputs:
-      sha:
+      git-sha:
         description: The SHA you want to deploy
         required: True
-      environment:
+      env:
         description: The environment you want to deplpoy to
         required: True
 env:
-  APP_NAME: example-app
+  SERVICE: example-app
+  US_REGISTRY_HOSTNAME: us.gcr.io
 jobs:
   deploy:
     name: Deploy a Version
     runs-on: ubuntu-latest
     steps:
+      - name: checkout
+        uses: actions/checkout@v2
+
       - name: Use the variable
-        run: echo deploying app ${{ env.APP_NAME }} ${{ github.event.inputs.sha }}
+        env:
+          IMAGE_NAME: ${{ env.US_REGISTRY_HOSTNAME }}/my-project/${{ env.SERVICE }}:${{ github.event.inputs.git-sha }}
+        run: echo deploying ${{ env.IAMGE_NAME }}
