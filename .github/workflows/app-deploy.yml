@@ -38,12 +38,13 @@ jobs:
         run: echo This is beta deployment to namespace ${{ env.NAMESPACE }} in cluster ${{ env.CLUSTER_NAME }}
 
       - name: Setup gcloud CLI
-        if: ${{ github.event.inputs.target == 'GCP' && github.event.inputs.environment == 'beta' }}
+        if: ${{ github.event.inputs.target == 'GCP' }}
         uses: google-github-actions/setup-gcloud@master
         env:
-          GCP_PROJECT: ${{ github.event.inputs.environment }}_GCP_PROJECT
+          GCP_PROJECT: secrets.${{ github.event.inputs.environment }}_GCP_PROJECT
+          GCP_CREDS: secrets.${{ github.event.inputs.environment }}_GCP_CREDENTIALS
         with:
           version: 'latest'
-          service_account_key: ${{ secrets.${{ github.event.inputs.environment }}_GCP_CREDENTIALS }}
+          service_account_key: ${{ env.GCP_CREDS }}
           export_default_credentils: true
-          project_id: ${{ secrets.${{ env.GCP_PROJECT }} }}
+          project_id: ${{ env.GCP_PROJECT }}
