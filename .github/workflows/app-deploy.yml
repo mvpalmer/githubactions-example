@@ -36,3 +36,14 @@ jobs:
       - name: if statement
         if: ${{ github.event.inputs.environment == 'beta' && github.event.inputs.target == 'AWS' }}
         run: echo This is beta deployment to namespace ${{ env.NAMESPACE }} in cluster ${{ env.CLUSTER_NAME }}
+
+      - name: Setup gcloud CLI
+        if: ${{ github.event.inputs.target == 'GCP' && github.event.inputs.environment == 'beta' }}
+        uses: google-github-actions/setup-gcloud@master
+        env:
+          GCP_PROJECT: ${{ github.event.inputs.environment }}_GCP_PROJECT
+        with:
+          version: 'latest'
+          service_account_key: ${{ secrets.${{ github.event.inputs.environment }}_GCP_CREDENTIALS }}
+          export_default_credentils: true
+          project_id: ${{ secrets.${{ env.GCP_PROJECT }} }}
