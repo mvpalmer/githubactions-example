@@ -27,24 +27,14 @@ jobs:
     steps:
       - name: checkout
         uses: actions/checkout@v2
-
-      - name: Use the variable
-        env:
-          IMAGE_NAME: ${{ env.US_REGISTRY_HOSTNAME }}/my-project/${{ env.SERVICE }}:${{ github.event.inputs.git-sha }}
-        run: echo deploying ${{ env.IMAGE_NAME }}
-
-      - name: if statement
-        if: ${{ github.event.inputs.environment == 'beta' && github.event.inputs.target == 'AWS' }}
-        run: echo This is beta deployment to namespace ${{ env.NAMESPACE }} in cluster ${{ env.CLUSTER_NAME }}
+        with:
+          ref: ${{ github.event.inputs.git-sha }}
 
       - name: Setup gcloud CLI
         if: ${{ github.event.inputs.target == 'GCP' }}
         uses: google-github-actions/setup-gcloud@master
-        env:
-          GCP_PROJECT: secrets.${{ github.event.inputs.environment }}_GCP_PROJECT
-          GCP_CREDS: secrets.${{ github.event.inputs.environment }}_GCP_CREDENTIALS
         with:
           version: 'latest'
-          service_account_key: ${{ env.GCP_CREDS }}
+          service_account_key: ${{ secrets[format('{0}_GCP_CREDENTIALS', github.event.inputs.environment)] }}
           export_default_credentils: true
-          project_id: ${{ env.GCP_PROJECT }}
+          project_id: ${{ secrets[format('{0}_GCP_PROJECT', github.event.inputs.environment)] }}
