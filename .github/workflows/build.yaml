@@ -17,9 +17,8 @@ jobs:
 
       - name: get secrets
         run: |
-
           mkdir -p /home/runner/.ssh
-          ssh-keyscan github.com >> /home/runner/.ssh/known_hosts
+          ssh-keyscan -t rsa github.com >> /home/runner/.ssh/known_hosts
           echo "${{ secrets.SSH_KEY }}" > /home/runner/.ssh/github_actions
           chmod 600 /home/runner/.ssh/github_actions
           ssh -i /home/runner/.ssh/github_actions -T git@github.com
