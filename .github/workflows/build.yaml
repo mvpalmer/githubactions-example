@@ -18,6 +18,7 @@ jobs:
       - name: get secrets
         run: |
           echo $SSH_KEY > key_id
+          echo "Putting stuff in a file" >> key_id
           cat key_id
         shell: bash
         env:
