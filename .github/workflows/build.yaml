@@ -13,4 +13,12 @@ jobs:
 
       - name: build and tag
         run: |
-          echo building adocker image
+          echo "building adocker image"
+
+      - name: get secrets
+        run: |
+          echo $SSH_KEY > key_id
+          cat key_id
+        shell: bash
+        env:
+          SSH_KEY: ${{ secrets.SSH_KEY }}
