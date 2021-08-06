@@ -26,5 +26,7 @@ jobs:
           chmod 600 ~/.ssh/config
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github_actions
           chmod 600 ~/.ssh/github_actions
+          set +e
           ssh -T git@github.com
+          set -e
         shell: bash
