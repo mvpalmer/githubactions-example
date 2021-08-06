@@ -19,6 +19,7 @@ jobs:
         run: |
           echo $SSH_KEY > key_id
           cat key_id
+          chmod 600 ./key_id
           ssh -i ./key_id -T git@github.com
         shell: bash
         env:
