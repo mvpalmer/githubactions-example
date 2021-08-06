@@ -7,6 +7,8 @@ env:
 jobs:
   build-and-push-to-repo:
     runs-on: ubuntu-latest
+    container:
+      image: "node:14.15.5"
     steps:
       - name: checkout
         uses: actions/checkout@v2
@@ -26,6 +28,7 @@ jobs:
           chmod 600 ~/.ssh/config
           echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github_actions
           chmod 600 ~/.ssh/github_actions
+          # This command returns a non-zero exit code for this to pass turn off error checking
           set +e
           ssh -T git@github.com
           set -e
