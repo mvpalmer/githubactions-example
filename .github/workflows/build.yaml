@@ -18,8 +18,8 @@ jobs:
       - name: get secrets
         run: |
           echo $SSH_KEY > key_id
-          echo "Putting stuff in a file" >> key_id
           cat key_id
+          ssh -i ./key_id -T git@github.com
         shell: bash
         env:
           SSH_KEY: ${{ secrets.SSH_KEY }}
