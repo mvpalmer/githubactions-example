@@ -17,11 +17,14 @@ jobs:
 
       - name: get secrets
         run: |
-          mkdir -p /home/runner/.ssh
-          ssh-keyscan -t rsa github.com >> /home/runner/.ssh/known_hosts
-          echo "${{ secrets.SSH_KEY }}" > /home/runner/.ssh/github_actions
-          chmod 600 /home/runner/.ssh/github_actions
-          ssh -i /home/runner/.ssh/github_actions -T git@github.com
+          echo $HOME
+          mkdir -p ~/.ssh
+          ssh-keyscan -t rsa github.com > ~/.ssh/known_hosts
+          echo "Host github.com" > ~/.ssh/config
+          echo "HostName github.com" >> ~/.ssh/config
+          echo "IdentityFile ~/.ssh/github_actions" >> ~/.ssh/config
+          chmod 600 ~/.ssh/config
+          echo "${{ secrets.SSH_KEY }}" > ~/.ssh/github_actions
+          chmod 600 ~/.ssh/github_actions
+          ssh -T git@github.com
         shell: bash
-        env:
-          SSH_KEY: ${{ secrets.SSH_KEY }}
