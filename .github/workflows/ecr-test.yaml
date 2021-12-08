@@ -36,8 +36,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: 679707349919.dkr.ecr.us-east-1.amazonaws.com/palmer:latest
-      username: ${{ env.ECR_USERNAME }}
-      password: ${{ needs.aws.outputs.registrytoken }}
+      credentials:
+        username: ${{ env.ECR_USERNAME }}
+        password: ${{ needs.aws.outputs.registrytoken }}
     steps:
       - uses: actions/checkout@v2
       - uses: aws-actions/configure-aws-credentials@v1
