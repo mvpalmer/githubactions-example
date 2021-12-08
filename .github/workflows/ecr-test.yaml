@@ -15,6 +15,7 @@ env:
 jobs:
   aws:
     name: ECR login
+    runs-on: ubuntu-latest
     container:
       image: public.ecr.aws/bitnami/aws-cli:2
       options: -u 0
@@ -32,6 +33,7 @@ jobs:
 
   snapshot:
     needs: aws
+    runs-on: ubuntu-latest
     container:
       image: 679707349919.dkr.ecr.us-east-1.amazonaws.com/palmer:latest
       username: ${{ env.ECR_USERNAME }}
