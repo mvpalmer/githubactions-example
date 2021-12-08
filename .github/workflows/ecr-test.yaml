@@ -1,0 +1,48 @@
+name: ECR login
+on:
+  workflow_dispatch:
+    # Inputs the workflow accepts.
+    inputs:
+      aws-region:
+        description: AWS Region
+        default: us-east-1
+        required: true
+
+env:
+  AWS_REGION: "us-east-1"
+  ECR_USERNAME: "AWS"
+
+jobs:
+  aws:
+    name: ECR login
+    container:
+      image: public.ecr.aws/bitnami/aws-cli:2
+      options: -u 0
+    outputs:
+      registrytoken: ${{ steps.ecr.outputs.token }}
+    steps:
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Fetch a ECR login token for later steps to use
+        run: echo "::set-output name=token::$(aws ecr get-login-password)"
+        id: ecr
+
+  snapshot:
+    needs: aws
+    container:
+      image: 679707349919.dkr.ecr.us-east-1.amazonaws.com/palmer:latest
+      username: ${{ env.ECR_USERNAME }}
+      password: ${{ needs.aws.outputs.registrytoken }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.PROD_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.PROD_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: List buckets
+        run: |
+          wget
